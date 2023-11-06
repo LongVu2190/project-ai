@@ -1,3 +1,4 @@
+# AI sử dụng minimax algorithm để chạy
 import chess
 import chess.svg
 

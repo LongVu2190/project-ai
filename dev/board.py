@@ -1,3 +1,4 @@
+# Bàn cờ gốc, tự đi quân cho 2 bên
 import chess
 import chess.svg
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt

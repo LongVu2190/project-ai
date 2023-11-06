@@ -1,3 +1,4 @@
+# Bao gồm bàn cờ, AI đi ở hàm ApplyMove() (AI chỉ thao tác ở hàm ApplyMove() ở file py này)
 import chess
 import chess.svg
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt

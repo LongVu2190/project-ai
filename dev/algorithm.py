@@ -1,6 +1,6 @@
-#%%
+# Chứa thuật toán gốc của minimax, chạy in ra trên terminal, 2 AI tự chơi với nhau
 import chess
-from engine.table import *
+from dev.table import *
 
 def evaluate_board(board):
     if board.is_checkmate():
@@ -105,4 +105,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-# %%

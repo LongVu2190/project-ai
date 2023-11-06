@@ -1,3 +1,4 @@
+# Để tạm code chạy thử
 import chess
 import chess.svg
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
