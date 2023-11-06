@@ -1,4 +1,3 @@
-#%%
 import chess
 import chess.svg
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
@@ -163,13 +162,17 @@ class BoardControls(QWidget):
       
 if __name__ == "__main__":
     # Test the ChessBoard class
-    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtWidgets import QApplication, QHBoxLayout
     q_app = QApplication([])
     board = ChessBoard()
-    board.UndoMove()
-    board.show()
     board_controls = BoardControls(board)
-    board_controls.setGeometry(300, 300, 200, 100)
-    board_controls.show()
+    
+    layout = QHBoxLayout()
+    layout.addWidget(board)
+    layout.addWidget(board_controls)
+    
+    main_widget = QWidget()
+    main_widget.setLayout(layout)
+    main_widget.show()
+    
     q_app.exec()
-# %%

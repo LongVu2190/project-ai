@@ -4,8 +4,80 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QDialog, QWidget, QRadioButton, QPushButton, QButtonGroup, QGroupBox, QHBoxLayout, QVBoxLayout
 import sys
-from dev.AI import AIPlayer
 
+def piece_value(piece):
+    # Assign values to chess pieces for evaluation
+    values = {
+        chess.PAWN: 100,
+        chess.KNIGHT: 320,
+        chess.BISHOP: 330,
+        chess.ROOK: 500,
+        chess.QUEEN: 900,
+        chess.KING: 20000,
+    }
+    return values.get(piece, 0)
+
+class AIPlayer:
+    def __init__(self, board):
+        self.board = board
+
+    def make_move(self):
+        # Implement an enhanced minimax algorithm here to choose the best move
+        best_move, _ = self.minimax(self.board, depth=2, alpha=float('-inf'), beta=float('inf'), maximizing_player=False)
+        return best_move
+
+    def minimax(self, board, depth, alpha, beta, maximizing_player):
+        if depth == 0 or board.is_game_over():
+            return None, self.evaluate_board(board)
+
+        legal_moves = list(board.legal_moves)
+        best_move = None
+        if maximizing_player:
+            best_eval = float('-inf')
+            for move in legal_moves:
+                board.push(move)
+                _, eval_score = self.minimax(board, depth - 1, alpha, beta, False)
+                board.pop()
+                if eval_score > best_eval:
+                    best_eval = eval_score
+                    best_move = move
+                alpha = max(alpha, best_eval)
+                if beta <= alpha:
+                    break
+            return best_move, best_eval
+        else:
+            best_eval = float('inf')
+            for move in legal_moves:
+                board.push(move)
+                _, eval_score = self.minimax(board, depth - 1, alpha, beta, True)
+                board.pop()
+                if eval_score < best_eval:
+                    best_eval = eval_score
+                    best_move = move
+                beta = min(beta, best_eval)
+                if beta <= alpha:
+                    break
+            return best_move, best_eval
+
+    def evaluate_board(self, board):
+        score = 0
+        for square, piece in board.piece_map().items():
+            if piece.color == chess.WHITE:
+                score += piece_value(piece)
+                score += self.get_capture_bonus(board, square)
+            else:
+                score -= piece_value(piece)
+                score -= self.get_capture_bonus(board, square)
+        return score
+
+    def get_capture_bonus(self, board, square):
+        capture_bonus = 0
+        for move in board.legal_moves:
+            if move.to_square == square and board.is_capture(move):
+                # Add a bonus for capturing opponent pieces
+                capture_bonus += 10000
+        return capture_bonus
+    
 class ChessBoard(QWidget, chess.Board):
     # An interactive chessboard that only allows legal moves
     ReadyForNextMove = pyqtSignal(str)
@@ -23,11 +95,20 @@ class ChessBoard(QWidget, chess.Board):
         wnd_wh = self.board_size + 2*self.svg_xy
         
         self.setMinimumSize(wnd_wh, wnd_wh)
+        
         self.svg_widget = QSvgWidget(parent=self)
+        self.undo_button = QPushButton("Undo", parent=self)
+        
+        v_layout = QVBoxLayout(self)
+        v_layout.addWidget(self.svg_widget)
+        v_layout.addWidget(self.undo_button)
+        
         self.svg_widget.setGeometry(self.svg_xy, self.svg_xy, self.board_size, self.board_size)
         
         self.last_click = None
         self.DrawBoard()
+        
+        self.undo_button.released.connect(self.UndoMove)
       
     @pyqtSlot(QWidget)
     def mousePressEvent(self, event):
@@ -74,8 +155,12 @@ class ChessBoard(QWidget, chess.Board):
     def UndoMove(self):
         try:
             self.pop()
+            self.pop()
+
+            if not self.is_game_over():
+                self.ReadyForNextMove.emit(self.fen())
+
             self.DrawBoard()
-            self.ReadyForNextMove.emit(self.fen())
         except IndexError:
             pass
          
@@ -148,36 +233,11 @@ class PromotionDialog(QDialog):
     def SelectedPiece(self):
         # Get the uci piece type the user selected from the dialog
         return self.button_group.checkedButton().text()
-      
-class BoardControls(QWidget):
-    # A UI used to modify the board  
-    def __init__(self, board, parent = None):
-        # Initialize the controls
-        super().__init__(parent)
-        
-        undo_button = QPushButton("Undo", self)
-        
-        v_layout = QVBoxLayout()
-        v_layout.addWidget(undo_button)
-        
-        self.setLayout(v_layout)
-        
-        # connect signals/slots
-        undo_button.released.connect(board.UndoMove)
-      
+
 if __name__ == "__main__":
     # Test the ChessBoard class
-    from PyQt5.QtWidgets import QApplication, QHBoxLayout
+    from PyQt5.QtWidgets import QApplication
     q_app = QApplication([])
     board = ChessBoard()
-    board_controls = BoardControls(board)
-    
-    layout = QHBoxLayout()
-    layout.addWidget(board)
-    layout.addWidget(board_controls)
-    
-    main_widget = QWidget()
-    main_widget.setLayout(layout)
-    main_widget.show()
-    
+    board.show()
     q_app.exec()

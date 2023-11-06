@@ -1,4 +1,3 @@
-#%%
 import chess
 import chess.svg
 
@@ -72,6 +71,5 @@ class AIPlayer:
         for move in board.legal_moves:
             if move.to_square == square and board.is_capture(move):
                 # Add a bonus for capturing opponent pieces
-                capture_bonus += 500  # Adjust this value as needed
+                capture_bonus += 10000
         return capture_bonus
-# %%
