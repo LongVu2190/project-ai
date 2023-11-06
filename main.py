@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QDialog, QWidget, QRadioButton, QPushButton, QButtonGroup, QGroupBox, QHBoxLayout, QVBoxLayout
 import sys
-from dev.ai import AIPlayer
+from dev.AI import AIPlayer
 
 class ChessBoard(QWidget, chess.Board):
     # An interactive chessboard that only allows legal moves
