@@ -75,6 +75,7 @@ class ChessBoard(QWidget, chess.Board):
     def UndoMove(self):
         try:
             self.pop()
+            self.pop()
             self.DrawBoard()
             self.ReadyForNextMove.emit(self.fen())
         except IndexError:
