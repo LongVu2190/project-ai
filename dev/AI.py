@@ -1,4 +1,3 @@
-# AI sử dụng minimax algorithm để chạy
 import chess
 import chess.svg
 from dev.table_value import piece_value
@@ -108,13 +107,21 @@ class AIPlayer:
                 starting_squares = [chess.B1, chess.G1]
             elif piece_type == chess.BISHOP:
                 starting_squares = [chess.C1, chess.F1]
+            elif piece_type == chess.ROOK:
+                starting_squares = [chess.A1, chess.H1]
+            elif piece_type == chess.QUEEN:
+                starting_squares = [chess.D1]
         else:
             if piece_type == chess.KNIGHT:
                 starting_squares = [chess.B8, chess.G8]
             elif piece_type == chess.BISHOP:
                 starting_squares = [chess.C8, chess.F8]
+            elif piece_type == chess.ROOK:
+                starting_squares = [chess.A8, chess.H8]
+            elif piece_type == chess.QUEEN:
+                starting_squares = [chess.D8]
         return len([p for p in board.pieces(piece_type, color) if p not in starting_squares])
-    
+   
     def doubled_pawn(self, board, square):
         # Check if there is a pawn of the same color on the adjacent file
         pawns = board.pieces(chess.PAWN, board.piece_at(square).color)
