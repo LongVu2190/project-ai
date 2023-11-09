@@ -44,7 +44,6 @@ class AIPlayer:
                 if beta <= alpha:
                     break
 
-            print(best_eval) 
             return best_move, best_eval
 
     def evaluate_board(self, board):
