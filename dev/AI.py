@@ -1,7 +1,7 @@
 # AI sử dụng minimax algorithm để chạy
 import chess
 import chess.svg
-from dev.table import piece_value
+from dev.table_value import piece_value
 
 class AIPlayer:
     def __init__(self, board):
