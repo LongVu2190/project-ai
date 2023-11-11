@@ -35,6 +35,7 @@ class ChessBoard(QWidget, chess.Board):
         # Update the board state based on user clicks If the state changes, update the svg widget
         if self.LeftClickedBoard(event):
             this_click = self.GetClicked(event)
+            self.HighlightLegalMoves(this_click)
             
             if self.last_click:
                 if self.last_click != this_click:
@@ -42,7 +43,32 @@ class ChessBoard(QWidget, chess.Board):
                     self.ApplyMove(uci + self.GetPromotion(uci))
                 
             self.last_click = this_click
-            print("user",self.last_click)
+    
+    def GetLegalMoves(self, piece_position):
+        # Get the piece at the given position
+        piece = self.piece_at(chess.parse_square(piece_position))
+
+        # If there is a piece at the given position
+        if piece:
+            # Get all legal moves
+            legal_moves = list(self.legal_moves)
+
+            # Filter the legal moves for the selected piece
+            legal_moves_for_piece = [move for move in legal_moves if move.from_square == chess.parse_square(piece_position)]
+            # Return the legal moves for the selected piece
+            return [(chess.square_name(move.from_square), chess.square_name(move.to_square)) for move in legal_moves_for_piece]
+
+        # If there is no piece at the given position, return an empty list
+        return []
+
+    def HighlightLegalMoves(self, this_click):
+        # Get the legal moves for the clicked piece
+        legal_moves = self.GetLegalMoves(this_click)
+        highlight_positions = [move[1] for move in legal_moves]
+
+        # Sử dụng biến highlight_positions để tạo ra hướng dẫn đi cho quân cờ
+        print(highlight_positions)
+      
     def GetPromotion(self, uci):
         # Get the uci piece type the pawn will be promoted to
         if chess.Move.from_uci(uci + 'q') in self.legal_moves:
@@ -50,7 +76,7 @@ class ChessBoard(QWidget, chess.Board):
             if dialog.exec() == QDialog.Accepted:
                 return dialog.SelectedPiece()
         return ''
-      
+    
     @pyqtSlot(str)
     def ApplyMove(self, uci):
         # Apply a move to the board
