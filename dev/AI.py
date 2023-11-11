@@ -8,7 +8,8 @@ class AIPlayer:
 
     def make_move(self):
         # Implement an enhanced minimax algorithm here to choose the best move
-        best_move, _ = self.minimax(self.board, depth=2, alpha=float('-inf'), beta=float('inf'), maximizing_player=True)
+        best_move, _ = self.minimax(self.board, depth=3, alpha=float('-inf'), beta=float('inf'), maximizing_player=True)
+        print(best_move)
         return best_move
 
     def minimax(self, board, depth, alpha, beta, maximizing_player):
@@ -29,6 +30,7 @@ class AIPlayer:
                 alpha = max(alpha, best_eval)
                 if beta <= alpha:
                     break
+
             return best_move, best_eval
         else:
             best_eval = float('inf')
@@ -42,8 +44,13 @@ class AIPlayer:
                 beta = min(beta, best_eval)
                 if beta <= alpha:
                     break
-
+            # print(best_move, best_eval)
+            # best_move_draw = [(best_move)]
+            # best_move_draw.reverse()
+            # print(best_move_draw[0])
             return best_move, best_eval
+
+        
 
     def evaluate_board(self, board):
         score = 0

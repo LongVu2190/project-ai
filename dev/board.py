@@ -42,7 +42,7 @@ class ChessBoard(QWidget, chess.Board):
                     self.ApplyMove(uci + self.GetPromotion(uci))
                 
             self.last_click = this_click
-         
+            print("user",self.last_click)
     def GetPromotion(self, uci):
         # Get the uci piece type the pawn will be promoted to
         if chess.Move.from_uci(uci + 'q') in self.legal_moves:
@@ -57,16 +57,20 @@ class ChessBoard(QWidget, chess.Board):
         move = chess.Move.from_uci(uci)
         if move in self.legal_moves:
             self.push(move)
+            self.DrawBoard()
+            self.repaint()
 
             if not self.is_game_over():
                 self.ReadyForNextMove.emit(self.fen())
 
                 # Check if it's black's turn, then let the AI player make a move
+                print(self.turn)
                 if self.turn == chess.BLACK:
                     ai_player = AIPlayer(self)
                     ai_move = ai_player.make_move()
                     if ai_move:
                         self.ApplyMove(ai_move.uci())
+                
             else:
                 print("Game over!")
                 self.GameOver.emit()
