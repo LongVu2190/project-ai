@@ -12,6 +12,8 @@ layout.addWidget(board_controls)
 
 main_widget = QWidget()
 main_widget.setLayout(layout)
+main_widget.setWindowTitle("Chess AI")
+main_widget.setFixedSize(830, 770)
 main_widget.show()
 
 q_app.exec()

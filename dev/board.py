@@ -15,10 +15,9 @@ class ChessBoard(QWidget, chess.Board):
     def __init__(self, parent = None):
         # Initialize the chessboard
         super().__init__(parent)
-        self.setWindowTitle("Chess")
         
         self.svg_xy = 50 # top left x,y-pos of chessboard
-        self.board_size = 600 # size of chessboard
+        self.board_size = 650 # size of chessboard
         self.margin = 0.05 * self.board_size
         self.square_size  = (self.board_size - 2*self.margin) / 8.0
         wnd_wh = self.board_size + 2*self.svg_xy
@@ -26,7 +25,7 @@ class ChessBoard(QWidget, chess.Board):
         self.setMinimumSize(wnd_wh, wnd_wh)
         self.svg_widget = QSvgWidget(parent=self)
         self.svg_widget.setGeometry(self.svg_xy, self.svg_xy, self.board_size, self.board_size)
-        
+      
         self.last_click = None
         self.DrawBoard()
  
@@ -67,7 +66,7 @@ class ChessBoard(QWidget, chess.Board):
         highlight_positions = [move[1] for move in legal_moves]
 
         # Sử dụng biến highlight_positions để tạo ra hướng dẫn đi cho quân cờ
-        print(highlight_positions)
+        # print(highlight_positions)
       
     def GetPromotion(self, uci):
         # Get the uci piece type the pawn will be promoted to
@@ -90,7 +89,6 @@ class ChessBoard(QWidget, chess.Board):
                 self.ReadyForNextMove.emit(self.fen())
 
                 # Check if it's black's turn, then let the AI player make a move
-                print(self.turn)
                 if self.turn == chess.BLACK:
                     ai_player = AIPlayer(self)
                     ai_move = ai_player.make_move()
