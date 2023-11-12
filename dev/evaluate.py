@@ -1,5 +1,5 @@
 import chess
-from table_values import *
+from dev.table_values import *
 
 def move_value(board: chess.Board, move: chess.Move, endgame: bool) -> float:
     """

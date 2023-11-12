@@ -1,4 +1,5 @@
 from dev.evaluate import evaluate_board
+import config
 
 class AIPlayer:
     def __init__(self, board):
@@ -6,7 +7,7 @@ class AIPlayer:
 
     def make_move(self):
         # Implement an enhanced minimax algorithm here to choose the best move
-        best_move, points = self.minimax(self.board, depth=4, alpha=float('-inf'), beta=float('inf'), maximizing_player=False)
+        best_move, points = self.minimax(self.board, depth=config.MINIMAX_DEPTH, alpha=float('-inf'), beta=float('inf'), maximizing_player=False)
         print("Your Point: " + str(points))
         return best_move
 
