@@ -1,5 +1,5 @@
 # Bao gồm bàn cờ, AI đi ở hàm ApplyMove() (AI chỉ thao tác ở hàm ApplyMove() ở file py này)
-import chess
+import chess, config
 import chess.svg
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from PyQt5.QtSvg import QSvgWidget
@@ -17,7 +17,7 @@ class ChessBoard(QWidget, chess.Board):
         super().__init__(parent)
         
         self.svg_xy = 50 # top left x,y-pos of chessboard
-        self.board_size = 650 # size of chessboard
+        self.board_size = config.BOARD_SIZE # size of chessboard
         self.margin = 0.05 * self.board_size
         self.square_size  = (self.board_size - 2*self.margin) / 8.0
         wnd_wh = self.board_size + 2*self.svg_xy
@@ -89,7 +89,7 @@ class ChessBoard(QWidget, chess.Board):
                 self.ReadyForNextMove.emit(self.fen())
 
                 # Check if it's black's turn, then let the AI player make a move
-                if self.turn == chess.BLACK:
+                if (config.AI_PLAYER == "BLACK" and self.turn == chess.BLACK) or (config.AI_PLAYER == "WHITE" and self.turn == chess.WHITE):
                     ai_player = AIPlayer(self)
                     ai_move = ai_player.make_move()
                     if ai_move:

@@ -7,7 +7,11 @@ class AIPlayer:
 
     def make_move(self):
         # Implement an enhanced minimax algorithm here to choose the best move
-        best_move, points = self.minimax(self.board, depth=config.MINIMAX_DEPTH, alpha=float('-inf'), beta=float('inf'), maximizing_player=False)
+        maximizing_player = False
+        if (config.AI_PLAYER == "WHITE"):
+            maximizing_player = True
+            
+        best_move, points = self.minimax(self.board, depth=config.MINIMAX_DEPTH, alpha=float('-inf'), beta=float('inf'), maximizing_player=maximizing_player)
         print("Your Point: " + str(points))
         return best_move
 
