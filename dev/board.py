@@ -2,7 +2,7 @@
 import sys, chess, config, chess.svg
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QDialog, QWidget, QRadioButton, QPushButton, QButtonGroup, QGroupBox, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QDialog, QWidget, QRadioButton, QPushButton, QButtonGroup, QGroupBox, QHBoxLayout, QVBoxLayout, QLabel
 
 from dev.AI import AIPlayer
 
@@ -24,11 +24,20 @@ class ChessBoard(QWidget, chess.Board):
         self.setMinimumSize(wnd_wh, wnd_wh)
         self.svg_widget = QSvgWidget(parent=self)
         self.svg_widget.setGeometry(self.svg_xy, self.svg_xy, self.board_size, self.board_size)
-      
+        self.label_AI_thinking = QLabel(self)
+        self.label_AI_thinking.setText("Con di me may vu")
+        self.label_AI_thinking.move(350, 0) 
+        v_layout = QVBoxLayout()
+        sub_layout = QVBoxLayout()
+        sub_layout.addWidget(self.label_AI_thinking)
+        v_layout.addChildLayout(sub_layout)
+        self.label_AI_thinking.hide()
+        self.setLayout(v_layout)
         self.last_click = None
         self.DrawBoard()
  
     @pyqtSlot(QWidget)
+            
     def mousePressEvent(self, event):
         # Update the board state based on user clicks If the state changes, update the svg widget
         if self.LeftClickedBoard(event):
@@ -41,7 +50,7 @@ class ChessBoard(QWidget, chess.Board):
                     self.ApplyMove(uci + self.GetPromotion(uci))
                 
             self.last_click = this_click
-    
+
     def GetLegalMoves(self, piece_position):
         # Get the piece at the given position
         piece = self.piece_at(chess.parse_square(piece_position))
@@ -89,10 +98,24 @@ class ChessBoard(QWidget, chess.Board):
 
                 # Check if it's black's turn, then let the AI player make a move
                 if (config.AI_PLAYER == "BLACK" and self.turn == chess.BLACK) or (config.AI_PLAYER == "WHITE" and self.turn == chess.WHITE):
+                    print("a")
+                    print("Condition met")
+                    print(f"config.AI_PLAYER: {config.AI_PLAYER}, self.turn: {self.turn}")
+                    self.label_AI_thinking.show() 
+                    self.DrawBoard()
+                    self.repaint()
+            
+                    # else: 
+                    #     self.label_AI_thinking.hide()
                     ai_player = AIPlayer(self)
                     ai_move = ai_player.make_move()
                     if ai_move:
-                        self.ApplyMove(ai_move.uci())
+                        self.ApplyMove(ai_move.uci()) 
+                else:
+                    self.label_AI_thinking.hide() 
+                    self.DrawBoard()
+                    self.repaint()
+                       
                 
             else:
                 print("Game over!")
@@ -189,9 +212,11 @@ class BoardControls(QWidget):
         
         undo_button = QPushButton("Undo", self)
         
-        v_layout = QVBoxLayout()
-        v_layout.addWidget(undo_button)
         
+        v_layout = QVBoxLayout()
+        # label_AI_thinking.hide()
+        v_layout.addWidget(undo_button)
+        # label_AI_thinking.hide()
         self.setLayout(v_layout)
         
         # connect signals/slots
