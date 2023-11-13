@@ -5,9 +5,9 @@ from PyQt5 import QtGui
 import io
 
 # for export .exe with pyinstaller
-stream = io.StringIO()
-sys.stdout = stream
-sys.stderr = stream
+# stream = io.StringIO()
+# sys.stdout = stream
+# sys.stderr = stream
 
 q_app = QApplication([])
 board = ChessBoard()
