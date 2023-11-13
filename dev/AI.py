@@ -1,18 +1,36 @@
 from dev.evaluate import evaluate_board
-import config
+from stockfish import Stockfish
+import config, chess.engine
 
 class AIPlayer:
     def __init__(self, board):
         self.board = board
 
+    # def make_move(self):
+    #     # Initialize the Stockfish chess engine
+    #     stockfish = Stockfish("./engine/engine.exe")
+
+    #     # Set the position to the current board state
+    #     stockfish.set_fen_position(self.board.fen())
+
+    #     # Get the best move in UCI format
+    #     best_move_uci = stockfish.get_best_move()
+
+    #     # Convert the UCI move string to a chess.Move object
+    #     best_move = chess.Move.from_uci(best_move_uci)
+
+    #     return best_move
+    
     def make_move(self):
         # Implement an enhanced minimax algorithm here to choose the best move
-        maximizing_player = False
+        maximizing = False
         if (config.AI_PLAYER == "WHITE"):
-            maximizing_player = True
+            maximizing = True
             
-        best_move, points = self.minimax(self.board, depth=config.MINIMAX_DEPTH, alpha=float('-inf'), beta=float('inf'), maximizing_player=maximizing_player)
+        best_move, points = self.minimax(self.board, depth=config.MINIMAX_DEPTH, alpha=float('-inf'), beta=float('inf'), maximizing_player=maximizing)
         print("Your Point: " + str(points))
+
+        print(type(best_move))
         return best_move
 
     def minimax(self, board, depth, alpha, beta, maximizing_player):

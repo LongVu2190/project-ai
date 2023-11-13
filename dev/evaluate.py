@@ -1,4 +1,5 @@
 import chess
+import chess.engine
 from dev.table_values import *
 
 def move_value(board: chess.Board, move: chess.Move, endgame: bool) -> float:
@@ -30,7 +31,6 @@ def move_value(board: chess.Board, move: chess.Move, endgame: bool) -> float:
 
     return current_move_value
 
-
 def evaluate_capture(board: chess.Board, move: chess.Move) -> float:
     """
     Given a capturing move, weight the trade being made.
@@ -44,7 +44,6 @@ def evaluate_capture(board: chess.Board, move: chess.Move) -> float:
             f"Pieces were expected at _both_ {move.to_square} and {move.from_square}"
         )
     return piece_value[_to.piece_type] - piece_value[_from.piece_type]
-
 
 def evaluate_piece(piece: chess.Piece, square: chess.Square, end_game: bool) -> int:
     piece_type = piece.piece_type
@@ -72,7 +71,6 @@ def evaluate_piece(piece: chess.Piece, square: chess.Square, end_game: bool) -> 
 
     return mapping[square]
 
-
 def evaluate_board(board: chess.Board) -> float:
     """
     Evaluates the full board and determines which player is in a most favorable position.
@@ -93,7 +91,6 @@ def evaluate_board(board: chess.Board) -> float:
         total += value if piece.color == chess.WHITE else -value
 
     return total
-
 
 def check_end_game(board: chess.Board) -> bool:
     """

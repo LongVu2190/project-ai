@@ -1,10 +1,9 @@
 # Bao gồm bàn cờ, AI đi ở hàm ApplyMove() (AI chỉ thao tác ở hàm ApplyMove() ở file py này)
-import chess, config
-import chess.svg
+import sys, chess, config, chess.svg
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QDialog, QWidget, QRadioButton, QPushButton, QButtonGroup, QGroupBox, QHBoxLayout, QVBoxLayout
-import sys
+
 from dev.AI import AIPlayer
 
 class ChessBoard(QWidget, chess.Board):
@@ -15,7 +14,7 @@ class ChessBoard(QWidget, chess.Board):
     def __init__(self, parent = None):
         # Initialize the chessboard
         super().__init__(parent)
-        
+
         self.svg_xy = 50 # top left x,y-pos of chessboard
         self.board_size = config.BOARD_SIZE # size of chessboard
         self.margin = 0.05 * self.board_size
@@ -141,10 +140,10 @@ class PromotionDialog(QDialog):
         super().__init__(parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
         self.setWindowTitle("Promotion")
         
-        radio_q = QRadioButton("q")
-        radio_r = QRadioButton("r")
-        radio_b = QRadioButton("b")
-        radio_n = QRadioButton("n")
+        radio_q = QRadioButton("q_Queen")
+        radio_r = QRadioButton("r_Rook")
+        radio_b = QRadioButton("b_Bishop")
+        radio_n = QRadioButton("n_Knight")
         
         self.button_group = QButtonGroup()
         self.button_group.addButton(radio_q)
@@ -180,7 +179,7 @@ class PromotionDialog(QDialog):
       
     def SelectedPiece(self):
         # Get the uci piece type the user selected from the dialog
-        return self.button_group.checkedButton().text()
+        return self.button_group.checkedButton().text()[0]
       
 class BoardControls(QWidget):
     # A UI used to modify the board  
