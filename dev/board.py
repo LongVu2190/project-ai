@@ -28,17 +28,27 @@ class ChessBoard(QWidget, chess.Board):
         self.setMinimumSize(wnd_wh, wnd_wh)
         self.svg_widget = QSvgWidget(parent=self)
         self.svg_widget.setGeometry(self.svg_xy, self.svg_xy, self.board_size, self.board_size)
+         # AI Thinking
         self.label_AI_thinking = QLabel(self)
+        self.label_AI_thinking.setStyleSheet("color: rgb(255,105,180); font-weight: bold; font-size: 26px")
         self.label_AI_thinking.setText("AI is thinking...")
-        self.label_AI_thinking.move(350, 0)
 
+        self.label_AI_thinking.move(300, 0) 
         v_layout = QVBoxLayout()
         sub_layout = QVBoxLayout()
         sub_layout.addWidget(self.label_AI_thinking)
         v_layout.addChildLayout(sub_layout)
-
         self.label_AI_thinking.hide()
-        self.setLayout(v_layout)
+
+
+
+        #
+        self.label_AI_thinking_move_flag = False
+        self.label_AI_thinking_offset_move = 1
+        self.x_coordinate = self.label_AI_thinking.pos().x()
+        #
+
+        self.setLayout(sub_layout)
         self.last_click = None
         self.DrawBoard()
 
@@ -106,11 +116,13 @@ class ChessBoard(QWidget, chess.Board):
 
             self.DrawBoard()
             sys.stdout.flush()
-         
+
+
     def AI_move(self):
         # Check if it's black's turn, then let the AI player make a move
         if (self.AI_player == "BLACK" and self.turn == chess.BLACK) or (self.AI_player == "WHITE" and self.turn == chess.WHITE):
-            self.label_AI_thinking.show() 
+            self.label_AI_thinking.show()
+            print(self.x_coordinate)
             self.DrawBoard()
             self.repaint()         
 
@@ -145,7 +157,6 @@ class ChessBoard(QWidget, chess.Board):
         # Highlight king if in check
         # Highlight legal moves for selected piece
         svg = self._repr_svg_().encode("utf-8")
-
         for pos in self.highlight_positions:
             svg = self.highlight_square(svg, pos)
         self.svg_widget.load(svg)
@@ -243,7 +254,8 @@ class BoardControls(QWidget):
         
         undo_button = QPushButton("Undo", self)
         
-        
+        self.setButtonStyle(undo_button, background_color="rgb(176,196,222)", text_color="#FFFFFF", font_size=14, button_size=(100, 50), scale_factor=1.5)
+
         v_layout = QVBoxLayout()
         # label_AI_thinking.hide()
         v_layout.addWidget(undo_button)
@@ -252,3 +264,17 @@ class BoardControls(QWidget):
         
         # connect signals/slots
         undo_button.released.connect(board.UndoMove)
+
+    def setButtonStyle(self, button, background_color, text_color, font_size, button_size, scale_factor):
+        # Scale the font size and button size
+        scaled_font_size = int(font_size * scale_factor)
+        scaled_button_size = (int(button_size[0] * scale_factor), int(button_size[1] * scale_factor))
+
+        # Set the style of the button
+        button.setStyleSheet(
+            f"QPushButton {{ background-color: {background_color}; color: {text_color}; font-size: {scaled_font_size}px; }}"
+            f"QPushButton:hover {{ border: 3px solid rgb(0,206,209); }}"  # Add hover effect if desired
+        )
+        button.setFixedSize(scaled_button_size[0], scaled_button_size[1])
+
+    
