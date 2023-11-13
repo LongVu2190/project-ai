@@ -1,4 +1,3 @@
-# Bao gồm bàn cờ, AI đi ở hàm ApplyMove() (AI chỉ thao tác ở hàm ApplyMove() ở file py này)
 import sys, chess, config, chess.svg
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from PyQt5.QtSvg import QSvgWidget
@@ -11,10 +10,14 @@ class ChessBoard(QWidget, chess.Board):
     ReadyForNextMove = pyqtSignal(str)
     GameOver = pyqtSignal()
    
-    def __init__(self, parent = None):
+    def __init__(self, minimax_depth, useStockfish, AI_player, parent = None):
         # Initialize the chessboard
         super().__init__(parent)
 
+        self.minimax_depth = minimax_depth
+        self.useStockfish = useStockfish
+        self.AI_player = AI_player
+        
         self.svg_xy = 50 # top left x,y-pos of chessboard
         self.board_size = config.BOARD_SIZE # size of chessboard
         self.margin = 0.05 * self.board_size
@@ -27,15 +30,20 @@ class ChessBoard(QWidget, chess.Board):
         self.svg_widget.setGeometry(self.svg_xy, self.svg_xy, self.board_size, self.board_size)
         self.label_AI_thinking = QLabel(self)
         self.label_AI_thinking.setText("AI is thinking...")
-        self.label_AI_thinking.move(350, 0) 
+        self.label_AI_thinking.move(350, 0)
+
         v_layout = QVBoxLayout()
         sub_layout = QVBoxLayout()
         sub_layout.addWidget(self.label_AI_thinking)
         v_layout.addChildLayout(sub_layout)
+
         self.label_AI_thinking.hide()
         self.setLayout(v_layout)
         self.last_click = None
         self.DrawBoard()
+
+        # if AI is white
+        self.AI_move()
  
     @pyqtSlot(QWidget)
             
@@ -53,9 +61,9 @@ class ChessBoard(QWidget, chess.Board):
                 
             self.last_click = this_click
 
-    def GetLegalMoves(self, piece_position):
+    def HighlightLegalMoves(self, this_click):
         # Get the piece at the given position
-        piece = self.piece_at(chess.parse_square(piece_position))
+        piece = self.piece_at(chess.parse_square(this_click))
 
         # If there is a piece at the given position
         if piece:
@@ -63,17 +71,14 @@ class ChessBoard(QWidget, chess.Board):
             legal_moves = list(self.legal_moves)
 
             # Filter the legal moves for the selected piece
-            legal_moves_for_piece = [move for move in legal_moves if move.from_square == chess.parse_square(piece_position)]
+            legal_moves_for_piece = [move for move in legal_moves if move.from_square == chess.parse_square(this_click)]
             # Return the legal moves for the selected piece
-            return [(chess.square_name(move.from_square), chess.square_name(move.to_square)) for move in legal_moves_for_piece]
+            legal_moves = [(chess.square_name(move.from_square), chess.square_name(move.to_square)) for move in legal_moves_for_piece]
+            self.highlight_positions = [move[1] for move in legal_moves]
 
         # If there is no piece at the given position, return an empty list
-        return []
-
-    def HighlightLegalMoves(self, this_click):
-        # Get the legal moves for the clicked piece
-        legal_moves = self.GetLegalMoves(this_click)
-        self.highlight_positions = [move[1] for move in legal_moves]
+        else:
+            self.highlight_positions = []
       
     def GetPromotion(self, uci):
         # Get the uci piece type the pawn will be promoted to
@@ -94,25 +99,7 @@ class ChessBoard(QWidget, chess.Board):
 
             if not self.is_game_over():
                 self.ReadyForNextMove.emit(self.fen())
-
-                # Check if it's black's turn, then let the AI player make a move
-                if (config.AI_PLAYER == "BLACK" and self.turn == chess.BLACK) or (config.AI_PLAYER == "WHITE" and self.turn == chess.WHITE):
-                    self.label_AI_thinking.show() 
-                    self.DrawBoard()
-                    self.repaint()
-            
-                    # else: 
-                    #     self.label_AI_thinking.hide()
-                    ai_player = AIPlayer(self)
-                    ai_move = ai_player.make_move()
-                    if ai_move:
-                        self.ApplyMove(ai_move.uci()) 
-                else:
-                    self.label_AI_thinking.hide() 
-                    self.DrawBoard()
-                    self.repaint()
-                       
-                
+                self.AI_move()                                  
             else:
                 print("Game over!")
                 self.GameOver.emit()
@@ -120,6 +107,28 @@ class ChessBoard(QWidget, chess.Board):
             self.DrawBoard()
             sys.stdout.flush()
          
+    def AI_move(self):
+        # Check if it's black's turn, then let the AI player make a move
+        if (self.AI_player == "BLACK" and self.turn == chess.BLACK) or (self.AI_player == "WHITE" and self.turn == chess.WHITE):
+            self.label_AI_thinking.show() 
+            self.DrawBoard()
+            self.repaint()         
+
+            ai_player = AIPlayer(self)
+
+            if (self.useStockfish):
+                ai_move = ai_player.stockfish_make_move()
+            else:
+                ai_move = ai_player.make_move(self.minimax_depth, self.AI_player)
+
+            if ai_move:
+                self.ApplyMove(ai_move.uci())
+
+        else:
+            self.label_AI_thinking.hide() 
+            self.DrawBoard()
+            self.repaint()
+
     @pyqtSlot()
     def UndoMove(self):
         try:
