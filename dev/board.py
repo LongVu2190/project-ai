@@ -254,7 +254,7 @@ class BoardControls(QWidget):
         
         undo_button = QPushButton("Undo", self)
         
-        self.setButtonStyle(undo_button, background_color="rgb(176,196,222)", text_color="#FFFFFF", font_size=14, button_size=(100, 50), scale_factor=1.5)
+        self.setButtonStyle(undo_button, background_color="rgb(176,196,222)", text_color="#000", font_size=14, button_size=(100, 50), scale_factor=1.5)
 
         v_layout = QVBoxLayout()
         # label_AI_thinking.hide()
