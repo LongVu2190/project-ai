@@ -30,7 +30,6 @@ class AIPlayer:
         best_move, points = self.minimax(self.board, depth=config.MINIMAX_DEPTH, alpha=float('-inf'), beta=float('inf'), maximizing_player=maximizing)
         print("Your Point: " + str(points))
 
-        print(type(best_move))
         return best_move
 
     def minimax(self, board, depth, alpha, beta, maximizing_player):

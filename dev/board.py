@@ -21,11 +21,12 @@ class ChessBoard(QWidget, chess.Board):
         self.square_size  = (self.board_size - 2*self.margin) / 8.0
         wnd_wh = self.board_size + 2*self.svg_xy
         
+        self.highlight_positions = []
         self.setMinimumSize(wnd_wh, wnd_wh)
         self.svg_widget = QSvgWidget(parent=self)
         self.svg_widget.setGeometry(self.svg_xy, self.svg_xy, self.board_size, self.board_size)
         self.label_AI_thinking = QLabel(self)
-        self.label_AI_thinking.setText("Con di me may vu")
+        self.label_AI_thinking.setText("AI is thinking...")
         self.label_AI_thinking.move(350, 0) 
         v_layout = QVBoxLayout()
         sub_layout = QVBoxLayout()
@@ -43,6 +44,7 @@ class ChessBoard(QWidget, chess.Board):
         if self.LeftClickedBoard(event):
             this_click = self.GetClicked(event)
             self.HighlightLegalMoves(this_click)
+            self.DrawBoard()
             
             if self.last_click:
                 if self.last_click != this_click:
@@ -71,10 +73,7 @@ class ChessBoard(QWidget, chess.Board):
     def HighlightLegalMoves(self, this_click):
         # Get the legal moves for the clicked piece
         legal_moves = self.GetLegalMoves(this_click)
-        highlight_positions = [move[1] for move in legal_moves]
-
-        # Sử dụng biến highlight_positions để tạo ra hướng dẫn đi cho quân cờ
-        # print(highlight_positions)
+        self.highlight_positions = [move[1] for move in legal_moves]
       
     def GetPromotion(self, uci):
         # Get the uci piece type the pawn will be promoted to
@@ -98,9 +97,6 @@ class ChessBoard(QWidget, chess.Board):
 
                 # Check if it's black's turn, then let the AI player make a move
                 if (config.AI_PLAYER == "BLACK" and self.turn == chess.BLACK) or (config.AI_PLAYER == "WHITE" and self.turn == chess.WHITE):
-                    print("a")
-                    print("Condition met")
-                    print(f"config.AI_PLAYER: {config.AI_PLAYER}, self.turn: {self.turn}")
                     self.label_AI_thinking.show() 
                     self.DrawBoard()
                     self.repaint()
@@ -138,7 +134,36 @@ class ChessBoard(QWidget, chess.Board):
         # Redraw the chessboard based on board state
         # Highlight src and dest squares for last move
         # Highlight king if in check
-        self.svg_widget.load(self._repr_svg_().encode("utf-8"))
+        # Highlight legal moves for selected piece
+        svg = self._repr_svg_().encode("utf-8")
+
+        for pos in self.highlight_positions:
+            svg = self.highlight_square(svg, pos)
+        self.svg_widget.load(svg)
+
+    def highlight_square(self, svg, pos):
+        # Convert the SVG from bytes to string
+        svg = svg.decode('utf-8')
+
+        # Convert the position to a square number
+        square_number = chess.parse_square(pos)
+
+        # Calculate the x and y coordinates of the square
+        x = (square_number % 8) * (config.BOARD_SIZE / 12.5) + config.BOARD_SIZE / 40
+        y = (7 - square_number // 8) * (config.BOARD_SIZE / 13) + config.BOARD_SIZE / 40
+
+        print("x: ", x)
+        print("y: ", y)
+        # Create a circle element
+        circle = f'<circle cx="{x}" cy="{y}" r="{config.BOARD_SIZE / 40}" fill="yellow" fill-opacity="1" />'
+
+        # Add the circle element to the svg
+        svg = svg.replace('</svg>', circle + '</svg>')
+
+        # Convert the SVG back to bytes
+        svg = svg.encode('utf-8')
+
+        return svg
       
     def GetClicked(self, event):
         # Get the algebraic notation for the clicked square
