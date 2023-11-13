@@ -29,26 +29,13 @@ class ChessBoard(QWidget, chess.Board):
         self.svg_widget = QSvgWidget(parent=self)
         self.svg_widget.setGeometry(self.svg_xy, self.svg_xy, self.board_size, self.board_size)
          # AI Thinking
+        # sub_layout = QVBoxLayout()
         self.label_AI_thinking = QLabel(self)
         self.label_AI_thinking.setStyleSheet("color: rgb(255,105,180); font-weight: bold; font-size: 26px")
         self.label_AI_thinking.setText("AI is thinking...")
 
         self.label_AI_thinking.move(300, 0) 
-        v_layout = QVBoxLayout()
-        sub_layout = QVBoxLayout()
-        sub_layout.addWidget(self.label_AI_thinking)
-        v_layout.addChildLayout(sub_layout)
         self.label_AI_thinking.hide()
-
-
-
-        #
-        self.label_AI_thinking_move_flag = False
-        self.label_AI_thinking_offset_move = 1
-        self.x_coordinate = self.label_AI_thinking.pos().x()
-        #
-
-        self.setLayout(sub_layout)
         self.last_click = None
         self.DrawBoard()
 
@@ -122,7 +109,6 @@ class ChessBoard(QWidget, chess.Board):
         # Check if it's black's turn, then let the AI player make a move
         if (self.AI_player == "BLACK" and self.turn == chess.BLACK) or (self.AI_player == "WHITE" and self.turn == chess.WHITE):
             self.label_AI_thinking.show()
-            print(self.x_coordinate)
             self.DrawBoard()
             self.repaint()         
 
@@ -273,7 +259,7 @@ class BoardControls(QWidget):
         # Set the style of the button
         button.setStyleSheet(
             f"QPushButton {{ background-color: {background_color}; color: {text_color}; font-size: {scaled_font_size}px; }}"
-            f"QPushButton:hover {{ border: 3px solid rgb(0,206,209); }}"  # Add hover effect if desired
+            f"QPushButton:hover {{ border: 3px solid rgb(105,105,105); }}"  # Add hover effect if desired
         )
         button.setFixedSize(scaled_button_size[0], scaled_button_size[1])
 
