@@ -1,27 +1,43 @@
 from dev.evaluate import evaluate_board
 from stockfish import Stockfish
 import config, chess.engine
+import sys, os, subprocess
 
 class AIPlayer:
     def __init__(self, board):
         self.board = board
-
-    # def make_move(self):
-    #     # Initialize the Stockfish chess engine
-    #     stockfish = Stockfish("./engine/engine.exe")
-
-    #     # Set the position to the current board state
-    #     stockfish.set_fen_position(self.board.fen())
-
-    #     # Get the best move in UCI format
-    #     best_move_uci = stockfish.get_best_move()
-
-    #     # Convert the UCI move string to a chess.Move object
-    #     best_move = chess.Move.from_uci(best_move_uci)
-
-    #     return best_move
     
     def make_move(self):
+        if config.STOCKFISH:
+            application_path = ""
+            if getattr(sys, 'frozen', False):
+                # Nếu chương trình đang chạy từ một tệp thực thi được đóng gói (exe)
+                application_path = "stockfish-windows-x86-64-avx2.exe"
+            else:
+                # Nếu đang chạy trong môi trường mã nguồn Python
+                if __file__:
+                    application_path = ".\stockfish\stockfish-windows-x86-64-avx2.exe"
+
+            # Initialize the Stockfish chess engine
+            stockfish = Stockfish(application_path)
+
+            # Set the position to the current board state
+            stockfish.set_fen_position(self.board.fen())
+
+            # Get the best move in UCI format
+            best_move_uci = stockfish.get_best_move()
+
+            # Convert the UCI move string to a chess.Move object
+            best_move = chess.Move.from_uci(best_move_uci)
+
+            # Get the evaluation score after making the best move
+            evaluation = stockfish.get_evaluation()
+            
+            # Print the evaluation score
+            print("Your score:", evaluation['value'])
+
+            return best_move
+        
         # Implement an enhanced minimax algorithm here to choose the best move
         maximizing = False
         if (config.AI_PLAYER == "WHITE"):

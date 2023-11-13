@@ -149,11 +149,8 @@ class ChessBoard(QWidget, chess.Board):
         square_number = chess.parse_square(pos)
 
         # Calculate the x and y coordinates of the square
-        x = (0.4+ square_number % 8) * (config.BOARD_SIZE / 14.3) + config.BOARD_SIZE / 40
+        x = (0.435 + square_number % 8) * (config.BOARD_SIZE / 14.3) + config.BOARD_SIZE / 40
         y = (7.43 - square_number // 8) * (config.BOARD_SIZE / 14.3) + config.BOARD_SIZE / 40
-
-        print("x: ", x)
-        print("y: ", y)
         # Create a circle element
         circle = f'<circle cx="{x}" cy="{y}" r="{config.BOARD_SIZE / 60}" fill="green" fill-opacity="0.8" />'
 
