@@ -23,12 +23,9 @@ class DepthDialog(QDialog):
         self.depth_input.setValue(3)
         self.depth_input.setFont(QFont("Arial", 16))
         self.depth_input.setFixedSize(120, 40)
-        self.depth_input.setStyleSheet("opacity: 0.5")
-        opacity_effect = QGraphicsOpacityEffect()
-        opacity_effect.setOpacity(0.8)  # Set the desired opacity value (0.0 to 1.0)
+        
 
         # Apply the QGraphicsOpacityEffect to the depth_input widget
-        self.depth_input.setGraphicsEffect(opacity_effect)
         # Tạo một checkbox mới với nhãn là "Impossible"
         self.checkbox = QCheckBox("Can not be defeated mode")
         self.checkbox.setFont(QFont("Arial", 12))
@@ -59,7 +56,7 @@ class DepthDialog(QDialog):
 
         layout = QVBoxLayout()
         #
-        spacer = QSpacerItem(0, -100, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
         layout.addItem(spacer)
  #
         bg_layout = QVBoxLayout()
@@ -67,6 +64,9 @@ class DepthDialog(QDialog):
         self.label_image.move(0, 0) 
         self.label_image.setStyleSheet("background-image : url(chess.png);")
         self.label_image.resize(820, 410)
+        opacity_effect = QGraphicsOpacityEffect()
+        opacity_effect.setOpacity(0.9) 
+        self.label_image.setGraphicsEffect(opacity_effect)
         bg_layout.addWidget(self.label_image)
         layout.addChildLayout(bg_layout)
         layout.addWidget(self.label1)
