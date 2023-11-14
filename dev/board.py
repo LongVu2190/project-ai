@@ -157,8 +157,13 @@ class ChessBoard(QWidget, chess.Board):
         # Calculate the x and y coordinates of the square
         x = (0.435 + square_number % 8) * (config.BOARD_SIZE / 14.3) + config.BOARD_SIZE / 40
         y = (7.43 - square_number // 8) * (config.BOARD_SIZE / 14.3) + config.BOARD_SIZE / 40
+        circle = None
+        if self.piece_at(chess.parse_square(pos)):
+            circle = f'<circle cx="{x}" cy="{y}" r="{config.BOARD_SIZE / 60}" fill="red" fill-opacity="0.9" />'
+        else:
+            circle = f'<circle cx="{x}" cy="{y}" r="{config.BOARD_SIZE / 60}" fill="green" fill-opacity="0.9" />'
         # Create a circle element
-        circle = f'<circle cx="{x}" cy="{y}" r="{config.BOARD_SIZE / 60}" fill="green" fill-opacity="0.8" />'
+        # circle = f'<circle cx="{x}" cy="{y}" r="{config.BOARD_SIZE / 60}" fill="green" fill-opacity="0.8" />'
 
         # Add the circle element to the svg
         svg = svg.replace('</svg>', circle + '</svg>')
