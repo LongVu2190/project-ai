@@ -61,9 +61,9 @@ class DepthDialog(QDialog):
  #
         bg_layout = QVBoxLayout()
         self.label_image = QLabel(self)
-        self.label_image.move(0, 0) 
+        self.label_image.move(-28, 0) 
         self.label_image.setStyleSheet("background-image : url(chess.png);")
-        self.label_image.resize(820, 410)
+        self.label_image.resize(490, 480)
         opacity_effect = QGraphicsOpacityEffect()
         opacity_effect.setOpacity(0.9) 
         self.label_image.setGraphicsEffect(opacity_effect)
@@ -78,7 +78,7 @@ class DepthDialog(QDialog):
         
         self.setLayout(layout)
         # Đặt kích thước cố định cho cửa sổ
-        self.setFixedSize(820, 410)
+        self.setFixedSize(450, 450)
 
 
 
