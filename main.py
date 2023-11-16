@@ -24,7 +24,7 @@ class DepthDialog(QDialog):
         self.depth_input.setFixedSize(200, 40)
         
         # Apply the QGraphicsOpacityEffect to the depth_input widget
-        self.checkbox = QCheckBox("Stockfish Mode (Depth: 15)")
+        self.checkbox = QCheckBox("Stockfish Mode")
         self.checkbox.setFont(QFont("Consolas", 20))
         self.checkbox.setStyleSheet("color: rgb(255,250,250); font-weight: bold; font-size: 20px")
         

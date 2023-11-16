@@ -30,6 +30,9 @@ class AIPlayer:
 
         # Get the evaluation score after making the best move
         evaluation = stockfish.get_evaluation()
+
+        stockfish.set_elo_rating(2800)
+        stockfish.set_depth(15)
         
         # Print the evaluation score
         print("White score:", evaluation['value'])

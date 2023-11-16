@@ -129,13 +129,14 @@ class ChessBoard(QWidget, chess.Board):
 
     @pyqtSlot()
     def UndoMove(self):
-        try:
-            self.pop()
-            self.pop()
-            self.DrawBoard()
-            self.ReadyForNextMove.emit(self.fen())
-        except IndexError:
-            pass
+        if not self.is_game_over():
+            try:
+                self.pop()
+                self.pop()
+                self.DrawBoard()
+                self.ReadyForNextMove.emit(self.fen())
+            except IndexError:
+                pass
          
     def DrawBoard(self):
         # Redraw the chessboard based on board state
