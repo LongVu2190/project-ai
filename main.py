@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QFont, QColor
 
 from PyQt5 import QtGui
-from dev.board import *
+from engine.board import *
 import config
 
 # for export .exe with pyinstaller
@@ -127,6 +127,11 @@ if dialog.exec() == QDialog.Accepted:
     depth = dialog.getDepth()
     stockfish = dialog.getCheckboxState()
     AI_Player = dialog.getDropdownValue()
+
+    if (not stockfish):
+        print("Depth:", depth)
+    else:
+        print("Stockfish Mode")
 
     board = ChessBoard(depth, stockfish, AI_Player)
 
