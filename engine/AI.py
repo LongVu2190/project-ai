@@ -1,4 +1,4 @@
-from engine.evaluate import evaluate_board
+from engine.evaluate import *
 from stockfish import Stockfish
 import sys, config, chess.engine
 
@@ -51,10 +51,16 @@ class AIPlayer:
         return best_move
 
     def minimax(self, board, depth, alpha, beta, maximizing_player):
-        if depth == 0 or board.is_game_over():
+        if board.is_checkmate():
+            return None, -1000000000 if maximizing_player else 1000000000
+
+        elif board.is_game_over():
+            return None, 0
+
+        if depth == 0:
             return None, evaluate_board(board)
 
-        legal_moves = list(board.legal_moves)
+        legal_moves = self.get_ordered_moves(board)
         best_move = None
         if maximizing_player:
             best_eval = float('-inf')
@@ -83,4 +89,20 @@ class AIPlayer:
                 if beta <= alpha:
                     break
             return best_move, best_eval
+        
+    def get_ordered_moves(self, board):
+        """
+        Get legal moves.
+        Attempt to sort moves by best to worst.
+        Use piece values (and positional gains/losses) to weight captures.
+        """
+        end_game = check_end_game(board)
+
+        def orderer(move):
+            return move_value(board, move, end_game)
+
+        in_order = sorted(
+            board.legal_moves, key=orderer, reverse=(board.turn == chess.WHITE)
+        )
+        return list(in_order)
   

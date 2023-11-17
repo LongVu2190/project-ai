@@ -15,8 +15,6 @@ def evaluate_board(board):
         value = piece_value[piece.piece_type] + evaluate_piece(piece, square, end_game)
         total += value if piece.color == chess.WHITE else -value
 
-    # total -= (king_safety(board, chess.WHITE) - king_safety(board, chess.BLACK))
-    # total += pawn_structure(board, chess.WHITE) - pawn_structure(board, chess.BLACK)
     return total
 
 def move_value(board, move, endgame):
@@ -95,50 +93,3 @@ def check_end_game(board):
         return True
 
     return False
-
-def king_safety(board: chess.Board, color: bool) -> float:
-    king_square = board.king(color)
-    safe = 0
-    if king_square:
-        # Count the number of squares attacked by the opponent around the king
-        opponent_moves = list(board.legal_moves)
-        opponent_attacks = [move for move in opponent_moves if move.to_square in board.attacks(king_square)]
-        safe = len(opponent_attacks)
-    return safe
-
-def pawn_structure(board, color):
-    score = 0
-    pawns = board.pieces(chess.PAWN, color)
-    for pawn in pawns:
-        # Penalize isolated pawns
-        if isolated_pawn(board, pawn):
-            score -= 0.5
-        # Penalize doubled pawns
-        if doubled_pawn(board, pawn):
-            score -= 0.5
-        # Reward passed pawns
-        if passed_pawn(board, pawn):
-            score += 1
-    return score
-
-def isolated_pawn(board, square):
-    file_index = chess.square_file(square)
-    pawn_files = [chess.square_file(pawn_square) for pawn_square in board.pieces(chess.PAWN, board.color_at(square))]
-    return pawn_files.count(file_index-1) == 0 and pawn_files.count(file_index+1) == 0
-
-def doubled_pawn(board, square):
-    file_index = chess.square_file(square)
-    pawn_files = [chess.square_file(pawn_square) for pawn_square in board.pieces(chess.PAWN, board.color_at(square))]
-    return pawn_files.count(file_index) > 1
-
-def passed_pawn(board, square):
-    file_index = chess.square_file(square)
-    rank_index = chess.square_rank(square)
-    color = board.color_at(square)
-    enemy_pawns = board.pieces(chess.PAWN, not color)
-    enemy_pawn_files = [chess.square_file(pawn_square) for pawn_square in enemy_pawns]
-    enemy_pawn_ranks = [chess.square_rank(pawn_square) for pawn_square in enemy_pawns if chess.square_file(pawn_square) in [file_index-1, file_index, file_index+1]]
-    if color == chess.WHITE:
-        return all(rank > rank_index for rank in enemy_pawn_ranks)
-    else:
-        return all(rank < rank_index for rank in enemy_pawn_ranks)
