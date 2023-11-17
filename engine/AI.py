@@ -52,7 +52,7 @@ class AIPlayer:
 
     def minimax(self, board, depth, alpha, beta, maximizing_player):
         if board.is_checkmate():
-            return None, -1000000000 if maximizing_player else 1000000000
+            return None, (-1000000 + depth * 10) if maximizing_player else (1000000 - depth * 10)
 
         elif board.is_game_over():
             return None, 0
@@ -66,11 +66,15 @@ class AIPlayer:
             best_eval = float('-inf')
             for move in legal_moves:
                 board.push(move)
-                _, eval_score = self.minimax(board, depth - 1, alpha, beta, False)
+                if board.is_checkmate():
+                    board.pop()
+                    return move, 1000000  # Return immediately if the move leads to a checkmate
+                current_move, eval_score = self.minimax(board, depth - 1, alpha, beta, False)
                 board.pop()
                 if eval_score > best_eval:
                     best_eval = eval_score
                     best_move = move
+
                 alpha = max(alpha, best_eval)
                 if beta <= alpha:
                     break
@@ -80,16 +84,20 @@ class AIPlayer:
             best_eval = float('inf')
             for move in legal_moves:
                 board.push(move)
-                _, eval_score = self.minimax(board, depth - 1, alpha, beta, True)
+                if board.is_checkmate():
+                    board.pop()
+                    return move, -1000000  # Return immediately if the move leads to a checkmate
+                current_move, eval_score = self.minimax(board, depth - 1, alpha, beta, True)
                 board.pop()
                 if eval_score < best_eval:
                     best_eval = eval_score
                     best_move = move
+
                 beta = min(beta, best_eval)
                 if beta <= alpha:
                     break
             return best_move, best_eval
-        
+       
     def get_ordered_moves(self, board):
         """
         Get legal moves.
