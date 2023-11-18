@@ -37,40 +37,41 @@ class AIPlayer:
         # Print the evaluation score
         print("White score:", evaluation['value'])
 
-        return best_move
+        return best_move, evaluation['value']
 
-    def make_move(self, minimax_depth, AI_player):        
+    def make_move(self, minimax_depth, AI_player):
         # Implement an enhanced minimax algorithm here to choose the best move
         maximizing = False
         if (AI_player == "WHITE"):
             maximizing = True
             
-        best_move, points = self.minimax(self.board, depth=minimax_depth, alpha=float('-inf'), beta=float('inf'), maximizing_player=maximizing)
-        print("White score: " + str(points))
+        best_move, score = self.minimax(depth=minimax_depth, alpha=float('-inf'), beta=float('inf'), maximizing_player=maximizing)
+        print("White score: " + str(score))
 
-        return best_move
+        return best_move, score
 
-    def minimax(self, board, depth, alpha, beta, maximizing_player):
-        if board.is_checkmate():
-            return None, (-1000000 + depth * 10) if maximizing_player else (1000000 - depth * 10)
-
-        elif board.is_game_over():
-            return None, 0
-
+    def minimax(self, depth, alpha, beta, maximizing_player):
         if depth == 0:
-            return None, evaluate_board(board)
+            return None, evaluate_board(self.board)
 
-        legal_moves = self.get_ordered_moves(board)
+        legal_moves = self.get_ordered_moves()
         best_move = None
         if maximizing_player:
             best_eval = float('-inf')
             for move in legal_moves:
-                board.push(move)
-                if board.is_checkmate():
-                    board.pop()
+                self.board.push(move)
+                if self.board.is_checkmate():
+                    self.board.pop()
                     return move, 1000000  # Return immediately if the move leads to a checkmate
-                current_move, eval_score = self.minimax(board, depth - 1, alpha, beta, False)
-                board.pop()
+                current_move, eval_score = self.minimax(depth - 1, alpha, beta, False)
+
+                # Tránh lặp lại nước dẫn tới hoà khi điểm trên 300
+                # Tránh bị hoà khi đối phương không đi được
+                if ((self.board.is_fivefold_repetition() or self.board.can_claim_threefold_repetition() and eval_score > 300) or self.board.is_stalemate()):
+                    self.board.pop()
+                    return None, -10000
+                
+                self.board.pop()
                 if eval_score > best_eval:
                     best_eval = eval_score
                     best_move = move
@@ -83,12 +84,12 @@ class AIPlayer:
         else:
             best_eval = float('inf')
             for move in legal_moves:
-                board.push(move)
-                if board.is_checkmate():
-                    board.pop()
+                self.board.push(move)
+                if self.board.is_checkmate():
+                    self.board.pop()
                     return move, -1000000  # Return immediately if the move leads to a checkmate
-                current_move, eval_score = self.minimax(board, depth - 1, alpha, beta, True)
-                board.pop()
+                current_move, eval_score = self.minimax(depth - 1, alpha, beta, True)
+                self.board.pop()
                 if eval_score < best_eval:
                     best_eval = eval_score
                     best_move = move
@@ -98,19 +99,19 @@ class AIPlayer:
                     break
             return best_move, best_eval
        
-    def get_ordered_moves(self, board):
+    def get_ordered_moves(self):
         """
         Get legal moves.
         Attempt to sort moves by best to worst.
         Use piece values (and positional gains/losses) to weight captures.
         """
-        end_game = check_end_game(board)
+        end_game = check_end_game(self.board)
 
         def orderer(move):
-            return move_value(board, move, end_game)
+            return move_value(self.board, move, end_game)
 
         in_order = sorted(
-            board.legal_moves, key=orderer, reverse=(board.turn == chess.WHITE)
+            self.board.legal_moves, key=orderer, reverse=(self.board.turn == chess.WHITE)
         )
         return list(in_order)
   

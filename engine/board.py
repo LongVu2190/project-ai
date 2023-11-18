@@ -34,16 +34,18 @@ class ChessBoard(QWidget, chess.Board):
         self.label_AI_thinking.setStyleSheet("color: rgb(255,105,180); font-weight: bold; font-size: 26px")
         self.label_AI_thinking.setText("AI is thinking...")
 
-        self.label_AI_thinking.move(300, 0) 
+        self.label_AI_thinking.setFixedSize(300, 50)
+        self.label_AI_thinking.move(280, 0) 
         self.label_AI_thinking.hide()
         self.last_click = None
+        self.score = 0
         self.DrawBoard()
 
         # if AI is white
         self.AI_move()
+        self.label_AI_thinking.show()
  
-    @pyqtSlot(QWidget)
-            
+    # @pyqtSlot(QWidget)           
     def mousePressEvent(self, event):
         # Update the board state based on user clicks If the state changes, update the svg widget
         if self.LeftClickedBoard(event):
@@ -85,7 +87,7 @@ class ChessBoard(QWidget, chess.Board):
                 return dialog.SelectedPiece()
         return ''
     
-    @pyqtSlot(str)
+    # @pyqtSlot(str)
     def ApplyMove(self, uci):
         # Apply a move to the board
         move = chess.Move.from_uci(uci)
@@ -98,36 +100,37 @@ class ChessBoard(QWidget, chess.Board):
                 self.ReadyForNextMove.emit(self.fen())
                 self.AI_move()                                  
             else:
-                print("Game over!")
+                print("Game over!!!")
+                self.label_AI_thinking.setText("Game over!!!")
+                self.DrawBoard()
                 self.GameOver.emit()
 
             self.DrawBoard()
             sys.stdout.flush()
 
-
     def AI_move(self):
         # Check if it's black's turn, then let the AI player make a move
         if (self.AI_player == "BLACK" and self.turn == chess.BLACK) or (self.AI_player == "WHITE" and self.turn == chess.WHITE):
-            self.label_AI_thinking.show()
+            self.label_AI_thinking.setText("AI is thinking...")
             self.DrawBoard()
             self.repaint()         
 
             ai_player = AIPlayer(self)
 
             if (self.useStockfish):
-                ai_move = ai_player.stockfish_make_move()
+                ai_move, self.score = ai_player.stockfish_make_move()
             else:
-                ai_move = ai_player.make_move(self.minimax_depth, self.AI_player)
+                ai_move, self.score = ai_player.make_move(self.minimax_depth, self.AI_player)
 
             if ai_move:
                 self.ApplyMove(ai_move.uci())
 
         else:
-            self.label_AI_thinking.hide() 
+            self.label_AI_thinking.setText(f"White score: {self.score}")
             self.DrawBoard()
             self.repaint()
 
-    @pyqtSlot()
+    # @pyqtSlot()
     def UndoMove(self):
         if not self.is_game_over():
             try:
