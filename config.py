@@ -13,3 +13,6 @@ BOARD_SIZE=650
 
 # Lỗi không đi khi -inf
 # 8/8/4k3/1b6/8/8/3q4/1K6 w - - 0 1
+
+# AI bên đen đi đến hoà
+# 7k/p1p4p/4r3/4p3/KP6/2r5/8/4R3 w - - 2 39
