@@ -28,8 +28,7 @@ class ChessBoard(QWidget, chess.Board):
         self.setMinimumSize(wnd_wh, wnd_wh)
         self.svg_widget = QSvgWidget(parent=self)
         self.svg_widget.setGeometry(self.svg_xy, self.svg_xy, self.board_size, self.board_size)
-         # AI Thinking
-        # sub_layout = QVBoxLayout()
+        # AI Thinking
         self.label_AI_thinking = QLabel(self)
         self.label_AI_thinking.setStyleSheet("color: rgb(255,105,180); font-weight: bold; font-size: 26px")
         self.label_AI_thinking.setText("AI is thinking...")
@@ -39,13 +38,14 @@ class ChessBoard(QWidget, chess.Board):
         self.label_AI_thinking.hide()
         self.last_click = None
         self.score = 0
+        # Custom board
+        # self.set_fen("4k2r/2r2pb1/1p4p1/4p2p/1n1pP3/1P1P1N2/3P1PPP/R1B2RK1 w k - 1 20")
         self.DrawBoard()
 
         # if AI is white
         self.AI_move()
         self.label_AI_thinking.show()
- 
-    # @pyqtSlot(QWidget)           
+         
     def mousePressEvent(self, event):
         # Update the board state based on user clicks If the state changes, update the svg widget
         if self.LeftClickedBoard(event):
@@ -87,7 +87,6 @@ class ChessBoard(QWidget, chess.Board):
                 return dialog.SelectedPiece()
         return ''
     
-    # @pyqtSlot(str)
     def ApplyMove(self, uci):
         # Apply a move to the board
         move = chess.Move.from_uci(uci)
@@ -130,7 +129,6 @@ class ChessBoard(QWidget, chess.Board):
             self.DrawBoard()
             self.repaint()
 
-    # @pyqtSlot()
     def UndoMove(self):
         if not self.is_game_over():
             try:

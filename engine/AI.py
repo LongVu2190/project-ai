@@ -1,6 +1,7 @@
 from engine.evaluate import *
 from stockfish import Stockfish
 import sys, config, chess.engine
+import math
 
 class AIPlayer:
     def __init__(self, board):
@@ -48,6 +49,10 @@ class AIPlayer:
         best_move, score = self.minimax(depth=minimax_depth, alpha=float('-inf'), beta=float('inf'), maximizing_player=maximizing)
         print("White score: " + str(score))
 
+        if (score == float('-inf')):
+            best_move = self.get_ordered_moves()[0]
+            score = -1000000
+
         return best_move, score
 
     def minimax(self, depth, alpha, beta, maximizing_player):
@@ -58,6 +63,10 @@ class AIPlayer:
         best_move = None
         if maximizing_player:
             best_eval = float('-inf')
+
+            # Không còn nước nào để đi
+            # if (len(legal_moves) == 0):
+            #     return None, -1000000
             for move in legal_moves:
                 self.board.push(move)
                 if self.board.is_checkmate():
@@ -66,16 +75,15 @@ class AIPlayer:
                 current_move, eval_score = self.minimax(depth - 1, alpha, beta, False)
 
                 # Tránh lặp lại nước dẫn tới hoà khi điểm trên 300
-                # Tránh bị hoà khi đối phương không đi được
+                # Tránh dẫn tới hoà khi đối phương không đi được (is_stalemate)
                 if ((self.board.is_fivefold_repetition() or self.board.can_claim_threefold_repetition() and eval_score > 300) or self.board.is_stalemate()):
                     self.board.pop()
-                    return None, -10000
+                    return legal_moves[0], evaluate_board(self.board)
                 
                 self.board.pop()
                 if eval_score > best_eval:
                     best_eval = eval_score
                     best_move = move
-
                 alpha = max(alpha, best_eval)
                 if beta <= alpha:
                     break
