@@ -1,7 +1,6 @@
 from engine.evaluate import *
 from stockfish import Stockfish
-import sys, config, chess.engine
-import math
+import sys, chess.engine
 
 class AIPlayer:
     def __init__(self, board):
@@ -41,7 +40,6 @@ class AIPlayer:
         return best_move, evaluation['value']
 
     def make_move(self, minimax_depth, AI_player):
-        # Implement an enhanced minimax algorithm here to choose the best move
         maximizing = False
         if (AI_player == "WHITE"):
             maximizing = True
@@ -49,37 +47,37 @@ class AIPlayer:
         best_move, score = self.minimax(depth=minimax_depth, alpha=float('-inf'), beta=float('inf'), maximizing_player=maximizing)
         print("White score: " + str(score))
 
-        if (score == float('-inf')):
-            best_move = self.get_ordered_moves()[0]
-            score = -1000000
-
         return best_move, score
 
-    def minimax(self, depth, alpha, beta, maximizing_player):
+    def minimax(self, depth, alpha, beta, maximizing_player):      
         if depth == 0:
             return None, evaluate_board(self.board)
 
         legal_moves = self.get_ordered_moves()
+        if (len(legal_moves) == 0):
+            return None, 0
+        
         best_move = None
+
         if maximizing_player:
             best_eval = float('-inf')
             for move in legal_moves:
                 self.board.push(move)
-                if self.board.is_checkmate():
-                    self.board.pop()
-                    return move, 1000000  # Return immediately if the move leads to a checkmate
-                current_move, eval_score = self.minimax(depth - 1, alpha, beta, False)
 
-                # Tránh lặp lại nước dẫn tới hoà khi điểm trên 300
-                # Tránh dẫn tới hoà khi đối phương không đi được (is_stalemate)
-                if ((self.board.is_fivefold_repetition() or self.board.can_claim_threefold_repetition() and eval_score > 300) or self.board.is_stalemate()):
+                if (self.board.is_checkmate()):
                     self.board.pop()
-                    return legal_moves[0], evaluate_board(self.board)
+                    return move, 100000
                 
+                current_move, eval_score = self.minimax(depth - 1, alpha, beta, False)          
                 self.board.pop()
+
+                if (self.board.can_claim_draw() or self.board.is_stalemate()):
+                    eval_score = 0
+
                 if eval_score > best_eval:
                     best_eval = eval_score
                     best_move = move
+
                 alpha = max(alpha, best_eval)
                 if beta <= alpha:
                     break
@@ -88,17 +86,19 @@ class AIPlayer:
         else:
             best_eval = float('inf')
             for move in legal_moves:
-                self.board.push(move)
-                if self.board.is_checkmate():
-                    self.board.pop()
-                    return move, -1000000  # Return immediately if the move leads to a checkmate
-                current_move, eval_score = self.minimax(depth - 1, alpha, beta, True)
+                self.board.push(move)     
 
-                if ((self.board.is_fivefold_repetition() or self.board.can_claim_threefold_repetition() and eval_score < -300) or self.board.is_stalemate()):
+                if (self.board.is_checkmate()):
                     self.board.pop()
-                    return legal_moves[0], -evaluate_board(self.board)
-            
+                    return move, -100000
+                
+                if (self.board.can_claim_draw() or self.board.is_stalemate()):
+                    eval_score = 0
+                
+                current_move, eval_score = self.minimax(depth - 1, alpha, beta, True)   
+                       
                 self.board.pop()
+                
                 if eval_score < best_eval:
                     best_eval = eval_score
                     best_move = move
@@ -106,14 +106,11 @@ class AIPlayer:
                 beta = min(beta, best_eval)
                 if beta <= alpha:
                     break
+                
             return best_move, best_eval
        
     def get_ordered_moves(self):
-        """
-        Get legal moves.
-        Attempt to sort moves by best to worst.
-        Use piece values (and positional gains/losses) to weight captures.
-        """
+        # Get legal moves ordered by move value
         end_game = check_end_game(self.board)
 
         def orderer(move):
@@ -123,4 +120,3 @@ class AIPlayer:
             self.board.legal_moves, key=orderer, reverse=(self.board.turn == chess.WHITE)
         )
         return list(in_order)
-  

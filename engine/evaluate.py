@@ -19,20 +19,25 @@ def evaluate_board(board):
 
 def move_value(board, move, endgame):
     if move.promotion is not None:
-        return -float("inf") if board.turn == chess.BLACK else float("inf")
+        return -10000 if board.turn == chess.BLACK else 10000
 
     piece = board.piece_at(move.from_square)
     from_value = evaluate_piece(piece, move.from_square, endgame)
     to_value = evaluate_piece(piece, move.to_square, endgame)
     position_change = to_value - from_value
 
-    capture_value = 0.0
+    capture_value = 0
     if board.is_capture(move):
         capture_value = evaluate_capture(board, move)
 
     current_move_value = capture_value + position_change
     if board.turn == chess.BLACK:
         current_move_value = -current_move_value
+
+    board.push(move)
+    if board.is_checkmate():
+        current_move_value = -100000 if board.turn == chess.BLACK else 100000
+    board.pop()
 
     return current_move_value
 

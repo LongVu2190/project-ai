@@ -3,13 +3,9 @@ from PyQt5.QtGui import QFont, QColor
 
 from PyQt5 import QtGui
 from engine.board import *
-import config
 
-# for export .exe with pyinstaller
-# import io, sys
-# stream = io.StringIO()
-# sys.stdout = stream
-# sys.stderr = stream
+# reference: https://github.com/healeycodes/andoma
+# Elo: ~1500 Depth 4
 
 class DepthDialog(QDialog):
     def __init__(self, parent=None):
@@ -80,7 +76,7 @@ class DepthDialog(QDialog):
         bg_layout = QVBoxLayout()
         self.label_image = QLabel(self)
         self.label_image.move(-28, 0) 
-        self.label_image.setStyleSheet("background-image : url(chess.png);")
+        self.label_image.setStyleSheet("background-image : url(img/chess.png);")
         self.label_image.resize(490, 480)
         opacity_effect = QGraphicsOpacityEffect()
         opacity_effect.setOpacity(0.9) 
@@ -121,7 +117,7 @@ class DepthDialog(QDialog):
 
 q_app = QApplication([])
 dialog = DepthDialog()
-dialog.setWindowIcon(QtGui.QIcon('favicon.ico'))
+dialog.setWindowIcon(QtGui.QIcon('img/favicon.ico'))
 
 if dialog.exec() == QDialog.Accepted:
     depth = dialog.getDepth()
@@ -143,10 +139,9 @@ if dialog.exec() == QDialog.Accepted:
 
     main_widget = QWidget()
     main_widget.setLayout(layout)
-    main_widget.setWindowTitle(config.SCREEN_TITLE)
-    main_widget.setWindowIcon(QtGui.QIcon('favicon.ico'))
-    main_widget.setFixedSize(config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
+    main_widget.setWindowTitle("Chess AI")
+    main_widget.setWindowIcon(QtGui.QIcon('img/favicon.ico'))
+    main_widget.setFixedSize(900, 770)
     main_widget.show()
 
     q_app.exec()
-

@@ -1,12 +1,12 @@
-import sys, chess, config, chess.svg
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
+import sys, chess, chess.svg
+
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QDialog, QWidget, QRadioButton, QPushButton, QButtonGroup, QGroupBox, QHBoxLayout, QVBoxLayout, QLabel
 
 from engine.AI import AIPlayer
 
 class ChessBoard(QWidget, chess.Board):
-    # An interactive chessboard that only allows legal moves
     ReadyForNextMove = pyqtSignal(str)
     GameOver = pyqtSignal()
    
@@ -19,7 +19,7 @@ class ChessBoard(QWidget, chess.Board):
         self.AI_player = AI_player
         
         self.svg_xy = 50 # top left x,y-pos of chessboard
-        self.board_size = config.BOARD_SIZE # size of chessboard
+        self.board_size = 650 # size of chessboard
         self.margin = 0.05 * self.board_size
         self.square_size  = (self.board_size - 2*self.margin) / 8.0
         wnd_wh = self.board_size + 2*self.svg_xy
@@ -39,7 +39,7 @@ class ChessBoard(QWidget, chess.Board):
         self.last_click = None
         self.score = 0
         # Custom board
-        # self.set_fen("7k/p1p4p/4r3/4p3/KP6/2r5/8/4R3 w - - 2 39")
+        self.set_fen("7k/8/6QP/8/8/4q3/6PK/8 b - - 0 1")
         self.DrawBoard()
 
         # if AI is white
@@ -99,8 +99,13 @@ class ChessBoard(QWidget, chess.Board):
                 self.ReadyForNextMove.emit(self.fen())
                 self.AI_move()                                  
             else:
-                print("Game over!!!")
-                self.label_AI_thinking.setText("Game over!!!")
+                if (self.can_claim_draw() or self.is_stalemate()):
+                    print("Draw match!!!")
+                    self.label_AI_thinking.setText("Draw match!!!")
+                else:
+                    print("Game over!!!")
+                    self.label_AI_thinking.setText("Game over!!!")
+
                 self.DrawBoard()
                 self.GameOver.emit()
 
@@ -157,13 +162,13 @@ class ChessBoard(QWidget, chess.Board):
         square_number = chess.parse_square(pos)
 
         # Calculate the x and y coordinates of the square
-        x = (0.435 + square_number % 8) * (config.BOARD_SIZE / 14.3) + config.BOARD_SIZE / 40
-        y = (7.43 - square_number // 8) * (config.BOARD_SIZE / 14.3) + config.BOARD_SIZE / 40
+        x = (0.435 + square_number % 8) * (self.board_size / 14.3) + self.board_size / 40
+        y = (7.43 - square_number // 8) * (self.board_size / 14.3) + self.board_size / 40
         circle = None
         if self.piece_at(chess.parse_square(pos)):
-            circle = f'<circle cx="{x}" cy="{y}" r="{config.BOARD_SIZE / 60}" fill="red" fill-opacity="0.9" />'
+            circle = f'<circle cx="{x}" cy="{y}" r="{self.board_size / 60}" fill="red" fill-opacity="0.9" />'
         else:
-            circle = f'<circle cx="{x}" cy="{y}" r="{config.BOARD_SIZE / 60}" fill="green" fill-opacity="0.9" />'
+            circle = f'<circle cx="{x}" cy="{y}" r="{self.board_size / 60}" fill="green" fill-opacity="0.9" />'
 
         # Add the circle element to the svg
         svg = svg.replace('</svg>', circle + '</svg>')
@@ -248,9 +253,7 @@ class BoardControls(QWidget):
         self.setButtonStyle(undo_button, background_color="rgb(176,196,222)", text_color="#000", font_size=14, button_size=(100, 50), scale_factor=1.5)
 
         v_layout = QVBoxLayout()
-        # label_AI_thinking.hide()
         v_layout.addWidget(undo_button)
-        # label_AI_thinking.hide()
         self.setLayout(v_layout)
         
         # connect signals/slots
@@ -267,5 +270,3 @@ class BoardControls(QWidget):
             f"QPushButton:hover {{ border: 3px solid rgb(105,105,105); }}"  # Add hover effect if desired
         )
         button.setFixedSize(scaled_button_size[0], scaled_button_size[1])
-
-    
