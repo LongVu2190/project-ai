@@ -39,7 +39,7 @@ class ChessBoard(QWidget, chess.Board):
         self.last_click = None
         self.score = 0
         # Custom board
-        # self.set_fen("7k/8/6QP/8/8/4q3/6PK/8 b - - 0 1")
+        # self.set_fen("8/kp6/3Q4/8/8/pq6/8/K7 w - - 0 1")
         self.DrawBoard()
 
         # if AI is white

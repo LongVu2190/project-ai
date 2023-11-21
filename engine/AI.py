@@ -49,7 +49,7 @@ class AIPlayer:
 
         return best_move, score
 
-    def minimax(self, depth, alpha, beta, maximizing_player):      
+    def minimax(self, depth, alpha, beta, maximizing_player):
         if depth == 0:
             return None, evaluate_board(self.board)
 
@@ -91,11 +91,11 @@ class AIPlayer:
                 if (self.board.is_checkmate()):
                     self.board.pop()
                     return move, -100000
-                
+                               
+                current_move, eval_score = self.minimax(depth - 1, alpha, beta, True)   
+
                 if (self.board.can_claim_draw() or self.board.is_stalemate()):
                     eval_score = 0
-                
-                current_move, eval_score = self.minimax(depth - 1, alpha, beta, True)   
                        
                 self.board.pop()
                 
