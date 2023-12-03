@@ -93,12 +93,11 @@ class AIPlayer:
                     return move, -100000
                                
                 current_move, eval_score = self.minimax(depth - 1, alpha, beta, True)   
+                self.board.pop()
 
                 if (self.board.can_claim_draw() or self.board.is_stalemate()):
                     eval_score = 0
-                       
-                self.board.pop()
-                
+                                     
                 if eval_score < best_eval:
                     best_eval = eval_score
                     best_move = move
